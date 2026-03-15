@@ -1,42 +1,52 @@
--- إنشاء الواجهة المربعة
+-- Uncle 0000 | ILN1O Grey Transparent Edition
 local screenGui = Instance.new("ScreenGui")
 local mainSquare = Instance.new("Frame")
 local titleLabel = Instance.new("TextLabel")
 local toggleButton = Instance.new("TextButton")
+local uiCorner = Instance.new("UICorner") -- لإضافة زوايا دائرية فخمة
+local btnCorner = Instance.new("UICorner")
 
-screenGui.Name = "UncleBeastFling"
-screenGui.Parent = game.CoreGui
+screenGui.Name = "UncleBeastFling_Grey"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+screenGui.ResetOnSpawn = false -- هذا السطر يمنع اختفاء السكربت عند الموت
 
 mainSquare.Name = "MainSquare"
 mainSquare.Parent = screenGui
-mainSquare.BackgroundColor3 = Color3.fromRGB(0, 0, 130)
-mainSquare.Size = UDim2.new(0, 150, 0, 150)
+mainSquare.BackgroundColor3 = Color3.fromRGB(45, 45, 45) -- لون رصاصي
+mainSquare.BackgroundTransparency = 0.4 -- شفافية رصاصية
+mainSquare.Size = UDim2.new(0, 160, 0, 130)
 mainSquare.Position = UDim2.new(0.4, 0, 0.4, 0)
 mainSquare.Active = true
 mainSquare.Draggable = true
 
+uiCorner.CornerRadius = UDim.new(0, 10)
+uiCorner.Parent = mainSquare
+
 titleLabel.Parent = mainSquare
-titleLabel.Size = UDim2.new(1, 0, 0.3, 0)
-titleLabel.Text = "@5e4m|تبي سكربتات اكثر ؟ طب الدسكورد"
+titleLabel.Size = UDim2.new(1, 0, 0.35, 0)
+titleLabel.Text = "UNCLE FLING"
 titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.BackgroundTransparency = 1
-titleLabel.TextSize = 16
-titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.TextSize = 14
+titleLabel.Font = Enum.Font.GothamBold
 
 toggleButton.Parent = mainSquare
-toggleButton.Position = UDim2.new(0.1, 0, 0.4, 0)
+toggleButton.Position = UDim2.new(0.1, 0, 0.45, 0)
 toggleButton.Size = UDim2.new(0.8, 0, 0.4, 0)
 toggleButton.Text = "OFF"
-toggleButton.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+toggleButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- رصاصي أغمق للزر
 toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 toggleButton.Font = Enum.Font.GothamBold
+toggleButton.TextSize = 16
 
--- المتغيرات
+btnCorner.CornerRadius = UDim.new(0, 8)
+btnCorner.Parent = toggleButton
+
+-- المتغيرات والوظائف (نفس الأصلية مع تحسين السرعة)
 local active = false
 local player = game.Players.LocalPlayer
 local namesToFind = {"فلوس", "بات مان", "فلوس بات مان"}
 
--- وظيفة تمسيك الأداة غصب
 local function forceEquip()
     local char = player.Character
     if not char then return end
@@ -58,9 +68,9 @@ toggleButton.MouseButton1Click:Connect(function()
     active = not active
     if active then
         toggleButton.Text = "ON"
-        toggleButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        toggleButton.BackgroundColor3 = Color3.fromRGB(0, 170, 0) -- أخضر عند التشغيل
         
-        spawn(function()
+        task.spawn(function()
             while active do
                 for _, target in pairs(game.Players:GetPlayers()) do
                     if not active then break end
@@ -69,15 +79,13 @@ toggleButton.MouseButton1Click:Connect(function()
                         local startTick = tick()
                         local hasFlung = false
 
-                        -- هجوم مستمر حتى يطير أو تمر 20 ثانية
                         while active and not hasFlung and (tick() - startTick) < 20 do
-                            forceEquip() -- يمسك الأداة غصب كل لحظة
+                            forceEquip() 
                             
                             local char = player.Character
                             local root = char and char:FindFirstChild("HumanoidRootPart")
                             
                             if root and tRoot then
-                                -- حركة التقطيع السريع WASD جنونية
                                 local offsets = {
                                     CFrame.new(0, 0, 1.5), CFrame.new(1.5, 0, 0),
                                     CFrame.new(0, 0, -1.5), CFrame.new(-1.5, 0, 0),
@@ -89,33 +97,30 @@ toggleButton.MouseButton1Click:Connect(function()
                                     game:GetService("RunService").Heartbeat:Wait()
                                 end
 
-                                -- تشييك: هل طار الشخص؟ (لو بعد عن مكانه بمسافة كبيرة أو اختفى)
                                 if (tRoot.Position.Y < -50 or tRoot.Position.Y > 500 or (tRoot.Position - root.Position).Magnitude > 100) then
                                     hasFlung = true
                                 end
                             else
-                                -- إذا مت، انتظر الرسبن وكمل فلينق
                                 player.CharacterAdded:Wait()
-                                wait(0.2)
+                                task.wait(0.2)
                                 root = player.Character:WaitForChild("HumanoidRootPart")
                             end
                         end
 
-                        -- إذا كمل 20 ثانية وما طار، يسوي ريست وينتقل للي بعده
                         if (tick() - startTick) >= 20 and not hasFlung then
                             if player.Character and player.Character:FindFirstChild("Humanoid") then
                                 player.Character.Humanoid.Health = 0
                                 player.CharacterAdded:Wait()
-                                wait(0.5)
+                                task.wait(0.5)
                             end
                         end
                     end
                 end
-                wait()
+                task.wait()
             end
         end)
     else
         toggleButton.Text = "OFF"
-        toggleButton.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+        toggleButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     end
 end)
